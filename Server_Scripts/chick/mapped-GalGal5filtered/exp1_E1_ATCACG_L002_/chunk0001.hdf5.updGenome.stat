@@ -1,0 +1,14 @@
+	010_MappedSide1:   3312452
+	020_MappedSide2:   3296977
+100_TotalReads:   3432055
+	150_ReadsWithoutUnusedChromosomes:   3432055
+		152_removedUnusedChromosomes:   0
+200_totalDSReads:   3177374
+		201_DS+SS:   3432055
+		202_SSReadsRemoved:   254681
+	210_sameFragmentReadsRemoved:   921823
+		212_Self-Circles:   34108
+		214_DandlingEnds:   885053
+		216_error:   2662
+	220_extraDandlingEndsRemoved:   436210
+300_ValidPairs:   1819341

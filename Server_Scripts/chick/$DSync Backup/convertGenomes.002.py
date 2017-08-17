@@ -14,7 +14,7 @@ genome_db_chrmLevel = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGa
 				chrmFileTemplate="%s.fna")
 
 
-dir_to_convert = "/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/Sample-2_S2_/"
+dir_to_convert = "/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/"
 files_to_convert = []
 
 for dirpath,dirnames,filenames in os.walk(dir_to_convert):
@@ -56,7 +56,7 @@ for fname in files_to_convert:
 	elif genome_dict != data["misc"]:
 		raise Exception("Possible genome mismatch in file "+fname)
 	
-	print "Genomes matches!"
+	print "Genome mathces!"
 	# convert data
 	if genome_db_contigLevel.chrmCount >= np.iinfo(np.int16).max - 1:
 		raise "Too many chromosomes. Current limit is ",np.iinfo(np.int16).max

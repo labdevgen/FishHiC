@@ -14,7 +14,7 @@ genome_db_chrmLevel = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGa
 				chrmFileTemplate="%s.fna")
 
 
-dir_to_convert = "/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/Sample-2_S2_/"
+dir_to_convert = "/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/"
 files_to_convert = []
 
 for dirpath,dirnames,filenames in os.walk(dir_to_convert):
@@ -28,7 +28,7 @@ print "Converting files:\n","\n".join(files_to_convert)
 genome_dict = "None"
 converter = Ccoordinates_converter(agp_folder = "/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/AGP",
 									chrm2accFile = "/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/chr2acc")
-converter.create_agp_dict() 
+converter.create_agp_dict()							
 
 for fname in files_to_convert:
 	data = h5dict(fname, mode="r")
@@ -56,7 +56,7 @@ for fname in files_to_convert:
 	elif genome_dict != data["misc"]:
 		raise Exception("Possible genome mismatch in file "+fname)
 	
-	print "Genomes matches!"
+	print "Genome mathces!"
 	# convert data
 	if genome_db_contigLevel.chrmCount >= np.iinfo(np.int16).max - 1:
 		raise "Too many chromosomes. Current limit is ",np.iinfo(np.int16).max
@@ -78,7 +78,7 @@ for fname in files_to_convert:
 			
 			if converter.contigsInfo[contigName][3] == "+":
 				cuts1[where1] = converter.contigsInfo[contigName][1] + cuts1[where1] - 1 
-				cuts2[where2] = converter.contigsInfo[contigName][1] + cuts2[where2] - 1
+				cuts2[where2] = converter.contigsInfo[contigName][1] + cuts2[where2] - 1				
 			elif converter.contigsInfo[contigName][3] == "-":
 				cuts1[where1] = converter.contigsInfo[contigName][2] - cuts1[where1] + 1
 				cuts2[where2] = converter.contigsInfo[contigName][2] - cuts2[where2] + 1
@@ -90,7 +90,7 @@ for fname in files_to_convert:
 	
 	where = np.logical_and(chrms1!=np.iinfo(np.int16).max, chrms2!=np.iinfo(np.int16).max)
 
-	assert sum(where) > len(chrms1)/2 # we lost <= 50% of data
+	assert sum(where) > len(chrms1)/50 # we lost <= 50% of data
 	
 	print "Saving"
 	out = h5dict(fname+".updGenome", mode="w")
