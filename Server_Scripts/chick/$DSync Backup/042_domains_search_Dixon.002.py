@@ -7,17 +7,16 @@ print "Starting domains_search_Dixon "
 print str(now)
 print "\n"
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import subprocess
 
 from mirnylib import genome
 from mirnylib import h5dict
-#from mirnylib import plotting
+from mirnylib import plotting
 from hiclib import binnedData
 from hiclib import fragmentHiC
-
 
 import argparse
 
@@ -186,6 +185,5 @@ if (not os.path.isfile(heatmap_filepath+".matrix.di.m.hmm_7colfile")):
    doDixon_PostProc()
    splitChrmsColFile()
 
-doDixon_PostProc()
 splitChrmsColFile()
 print "Done!\n"

@@ -9,11 +9,14 @@ except:
 
 import os
 import gzip
+from mirnylib.systemutils import setExceptionHook
+setExceptionHook()
 
-if len(sys.argv) != 4:
+if len(sys.argv) < 4:
 	print "-------------Usage:----------"
-	print sys.argv[0]," path_do_directory_with_domains mode color"
-	print "mode: a = armatus domains, d = dixon domains"
+	print sys.argv[0]," path_do_directory_with_domains mode color (resolution)"
+	print "mode: a = armatus domains, d = dixon domains t = TADtree domains"
+	print "for TADtree mode please also provide resolution"
 	print "color: RGB color, e.g. 255,0,0"
 	sys.exit()
 
@@ -34,10 +37,50 @@ elif mode == "d":
 	genome_db = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
 				readChrms=[],
 				chrmFileTemplate="%s.fna")
-	end = ".final_domains"
+	filter = lambda x: x.endswith(".final_domains")
+elif mode == "t":
+	resolution = int(sys.argv[4])
+	import numpy as np
+	import numpy.lib.recfunctions
+	from mirnylib import genome
+	from intervaltree import Interval, IntervalTree
+	genome_db = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
+				readChrms=[],
+				chrmFileTemplate="%s.fna")
+	filter = lambda x: x.startswith("chr")
+	def process_TADtree(fname):
+		dup=np.atleast_1d(np.genfromtxt(dir+"/"+fname+"/proportion_duplicates.txt",dtype=None,skip_header=1))
+		N_index = min(len(dup)-1,np.searchsorted(dup["f1"],0.02))
+		N = dup["f0"][N_index]
+		print "For chr",fname," using N=",N,"; total N=",dup["f0"][-1]
+		domains = np.atleast_1d(np.genfromtxt(dir+"/"+fname+"/"+N+".txt",dtype=None,skip_header=1))
+		length = (1./(domains["f2"]-domains["f1"]))
+		domains = numpy.lib.recfunctions.append_fields(domains,["l"],[length],usemask=False)
+		domains = np.sort(domains,order=["f1","l"])
+		domains["f1"] = (domains["f1"]-1)*resolution# - resolution / 2
+		domains["f2"] = (domains["f2"]-1)*resolution# - resolution / 2
+		assert np.all(domains["f1"]>=0)
+		assert np.all(domains["f2"]>0)
+		levels = []
+		domainsTree = IntervalTree()
+		for i in domains:
+			st = i["f1"]
+			end = i["f2"]
+			levels.append(len(domainsTree[st+1:end-1]))
+			domainsTree[st+1:end-1] = 1
+		assert len(levels)==len(domains)
+		return levels,domains
 
-for fname in [f for f in os.listdir(dir+"/") if f.endswith(end)]:
-#	print "Processing ",fname
+for fname in [f for f in os.listdir(dir+"/") if filter(f)]:
+	print "Processing ",fname
+	if mode=="t":
+		levels,domains = process_TADtree(fname)
+		print "Max Level = ",max(levels)
+		for i,level in zip(domains,levels):
+			out.write("\t".join(map(str,[i["f0"],i["f1"],i["f2"],\
+						i["f0"],i["f1"],i["f2"],\
+						color,"Level_"+str(level)+"_"+dir.split("/")[-1]]))+"\n")
+		continue
 	file = open(dir+"/"+fname)
 	for line in file:
 		if "Nchr" in line:

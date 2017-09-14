@@ -48,8 +48,7 @@ BD.removePoorRegions(cutoff=1)
 BD.truncTrans(high=0.0005)
 
 #Remove diagonal
-m=0
-BD.removeDiagonal(m=m)
+BD.removeDiagonal()
 
 print datetime.datetime.now()," performing IC"
 # Perform iterative correction.
@@ -57,23 +56,13 @@ BD.iterativeCorrectWithoutSS()
 
 #Export hmap
 print datetime.datetime.now()," exporting"
-if m != 1:
-	#m=1 for all heatmaps used.
-	#The only different m=0 was used for TADtree
-	#To avoid confusion between heatmap created for TADtree and all other heatmaps
-	#The m values is checked before export
-	print "Warning! Not saving heatmap with m=",m
-else:
-	BD.export("heatmap",hmap+".IC")
-
-#out_folder = hmap+".gzipped_matrix"
-out_folder = hmap+".gzipped_matrix_for_TADtree"
+BD.export("heatmap",hmap+".IC")
 
 if not args.noexp:
-	if not os.path.exists(out_folder):
-		os.makedirs(out_folder)
+	if not os.path.exists(hmap+".gzipped_matrix"):
+		os.makedirs(hmap+".gzipped_matrix")
 
 	print datetime.datetime.now()," saving as txt"	
 	for chrm,start,end in zip(range(len(genome_db.chrmStartsBinCont)),genome_db.chrmStartsBinCont,genome_db.chrmEndsBinCont):
-		np.savetxt(out_folder+"/N"+genome_db.idx2label[chrm]+".gz",BD.dataDict["heatmap"][start:end,start:end],delimiter="\t")
+		np.savetxt(hmap+".gzipped_matrix/N"+genome_db.idx2label[chrm]+".gz",BD.dataDict["heatmap"][start:end,start:end],delimiter="\t")
 print datetime.datetime.now()," Done."

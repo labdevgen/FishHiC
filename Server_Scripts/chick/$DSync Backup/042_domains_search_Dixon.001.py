@@ -7,17 +7,16 @@ print "Starting domains_search_Dixon "
 print str(now)
 print "\n"
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import subprocess
 
 from mirnylib import genome
 from mirnylib import h5dict
-#from mirnylib import plotting
+from mirnylib import plotting
 from hiclib import binnedData
 from hiclib import fragmentHiC
-
 
 import argparse
 
@@ -125,8 +124,8 @@ def doDixon_PostProc():
 #    executeBashCommand("bash ~/modules.sh'")
     executeBashCommand("bash -c 'module load matlab/r2013b'")
     bashCommand ="matlab nodisplay -nodesktop -nojvm -nosplash -r "+fname
-    executeBashCommand(bashCommand)
-#    executeBashCommand("rm "+fname)
+#    executeBashCommand(bashCommand)
+    executeBashCommand("rm "+fname)
 
   print ".m file is ready \n"
   bashCommand="perl "+HMM_file_path+"perl_scripts/file_ends_cleaner.pl "+heatmap_filepath+".matrix.di.m "+heatmap_filepath+".matrix.di"  
@@ -186,6 +185,5 @@ if (not os.path.isfile(heatmap_filepath+".matrix.di.m.hmm_7colfile")):
    doDixon_PostProc()
    splitChrmsColFile()
 
-doDixon_PostProc()
 splitChrmsColFile()
 print "Done!\n"

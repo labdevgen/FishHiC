@@ -17,12 +17,9 @@ genome_db_chrmLevel = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGa
 				chrmFileTemplate="%s.fna")
 				
 				
-hm_file = sys.argv[1]
+hm_file = "/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filteredChrmLevel/ChEF-all-HindIII-100k.hm"
 
-sys.path.append("/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/utils")
-import figPath
-import ntpath
-f_out_path=figPath.figure_path+ntpath.basename(hm_file)+'.eig'
+f_out_path=hm_file+'.eig'
 
 NumEigenvectors = 1  # number of eigenvectors to compute
 
