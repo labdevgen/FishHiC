@@ -30,13 +30,13 @@ else:
 #and prepare chrm.size file
 
 out = open(out_file_prefix+".chrm.size","w")
-#genome_db = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/galGal5_all_contigs.filtered/",
-#				readChrms=[],
-#				chrmFileTemplate="N%s.fa")
-
-genome_db = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
+genome_db = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/galGal5_all_contigs.filtered/",
 				readChrms=[],
-				chrmFileTemplate="%s.fna")
+				chrmFileTemplate="N%s.fa")
+
+# genome_db = genome.Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
+				# readChrms=[],
+				# chrmFileTemplate="%s.fna")
 
 
 if mode == "chr":

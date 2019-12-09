@@ -43,13 +43,14 @@ if args.level == "contig":
 				readChrms=[],
 				chrmFileTemplate="N%s.fa")
 elif args.level == "chr":
-	#genome_db = Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
-	#			readChrms=[],
-	#			chrmFileTemplate="%s.fna")
-	genome_db = Genome('/mnt/storage/home/vsfishman/HiC/fasta/mm9', readChrms=['#', 'X'])
+	genome_db = Genome("/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/",
+				readChrms=[],
+				chrmFileTemplate="%s.fna")
+	#genome_db = Genome('/mnt/storage/home/vsfishman/HiC/fasta/mm9', readChrms=['#', 'X'])
 
 hm_file = args.hmap
 figure_path = args.out+"/"+hm_file.split("/")[-1]
+
 if args.domains != "":
 	domains=args.domains.split(",")
 	colors=args.colors.split(",")

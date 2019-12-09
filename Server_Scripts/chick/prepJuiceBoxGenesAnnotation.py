@@ -1,5 +1,8 @@
 import sys
 
+from mirnylib.systemutils import setExceptionHook
+setExceptionHook()
+
 def print_usage():
 	print "---------------------------"
 	print "Usage:"
@@ -146,6 +149,8 @@ with open(gff_fname) as gff_file:
 		else:
 			end.nt = end.nt+5000
 			start.nt = max(0,end.nt-5000)
+		
+		assert end.nt-start.nt > 5500
 		
 		if contig_type == "chrm":
 			if out_type == "BED":

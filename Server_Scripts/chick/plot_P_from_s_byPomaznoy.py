@@ -18,6 +18,12 @@ from mirnylib.systemutils import setExceptionHook
 setExceptionHook()
 import datetime
 
+import sys
+sys.path.append("/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/utils")
+import figPath
+figure_path=figPath.figure_path
+
+
 #######################
 
 
@@ -36,6 +42,8 @@ data = {
 					genome_db_contig,"micro"],
 "Fibs_macro" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/ChEF-all-HindIII_refined.frag", 
 					genome_db_contig,"macro"],
+"Fibs_chr17-19-22" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/ChEF-all-HindIII_refined.frag", 
+					genome_db_contig,"chr17_chr19_chr_22"],
 "Fibs_all" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/ChEF-all-HindIII_refined.frag", 
 					genome_db_contig,None],
 #"Fibs_active" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/ChEF-all-HindIII_refined.frag", 
@@ -47,7 +55,9 @@ data = {
 "Blood_micro" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/Blood-all-HindIII_refined.frag", 
 					genome_db_contig,"micro"],
 "Blood_macro" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/Blood-all-HindIII_refined.frag", 
-					genome_db_contig,"macro"]
+					genome_db_contig,"macro"],
+"Blood_chr17-19-22" : ["/mnt/storage/home/vsfishman/HiC/tutorial_Fishman/chick/mapped-GalGal5filtered/GalGal5filtered/Blood-all-HindIII_refined.frag", 
+					genome_db_contig,"chr17_chr19_chr_22"],
 }
 
 
@@ -66,14 +76,16 @@ for key in data:
 			mode='w',
 			enzymeName="HindIII")
 	fragments.load(data[key][0])
-	print "Preparing regions"
+	print "Preparing regions for ",key
 	
 	chrms1 = np.array(fragments._getVector("chrms1"),dtype=np.uint16)
-	chrms1 = chrms1[::len(chrms1)/10000]
-	if data[key][2] == None:
+	chrms1 = chrms1[::len(chrms1)/10000] #This is a representative sample of 0.01% of contacts
+	if data[key][2] == None:  #data[key][2] possible values: micro, macro, None
+								#None counts all chromosomes
 		regions = []
 		for chrm in range(genome_db.chrmCount):
-			if sum(chrms1==chrm) > 1:
+			if sum(chrms1==chrm) > 1: #Check that there are enough contacts on this chromsome, 
+										#i.e. contacts of this chromosome account for > 0.01% of all contacts
 				regions.append((chrm,0,genome_db.chrmLens[chrm]))
 		(abscissa[key],ordinata[key])=fragments.plotScaling(withinArms=False,regions=regions)
 	elif (data[key][2] == "micro") or (data[key][2] == "macro"):
@@ -84,14 +96,31 @@ for key in data:
 		converter.prepare_acc2chrmDict()
 		converter.create_agp_dict()
 		chrmLabels = converter.getChrmsByType(format="contig")[data[key][2]]
-		print chrmLabels
-		chrms = [genome_db.label2idx[c[1:]] for c in chrmLabels if c[1:] in genome_db.label2idx.keys()]
+		print "Using chromosomes: ",chrmLabels
+		chrms = [genome_db.label2idx[c[1:]] for c in chrmLabels if c[1:] in genome_db.label2idx.keys()] #Stupid names: in genome_db they are T_nnnn due to chrmFileTemplate="N%s.fa", but normally they are NT_nnnn.
 		print len(chrms)," chrms out of ",len(chrmLabels)," found in genome"
 		for chrm in range(genome_db.chrmCount):
 			if sum(chrms1==chrm) > 1 and (chrm in chrms):
 				regions.append((chrm,0,genome_db.chrmLens[chrm]))
+		print "After filtering using ",len(regions)," regions"
 		(abscissa[key],ordinata[key])=fragments.plotScaling(withinArms=False,regions=regions)
-	else : 
+	elif (data[key][2]=="chr17_chr19_chr_22"):
+		regions = []
+		from lib_coordinates_converter import *
+		converter = Ccoordinates_converter(agp_folder = "/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/AGP",
+									chrm2accFile = "/mnt/storage/home/vsfishman/HiC/fasta/GalGal5/GCF_000002315.4_Gallus_gallus-5.0_assembly_structure/Primary_Assembly/assembled_chromosomes/chr2acc")
+		converter.prepare_acc2chrmDict()
+		converter.create_agp_dict()
+		chrmLabels = [i for chr in ["chr17","chr19","chr22"] for i in converter.chrm2contig[chr]] 
+		print "Using chromosomes: ",chrmLabels
+		chrms = [genome_db.label2idx[c[1:]] for c in chrmLabels if c[1:] in genome_db.label2idx.keys()] #Stupid names: in genome_db they are T_nnnn due to chrmFileTemplate="N%s.fa", but normally they are NT_nnnn.
+		print len(chrms)," chrms out of ",len(chrmLabels)," found in genome"
+		for chrm in range(genome_db.chrmCount):
+			if sum(chrms1==chrm) > 1 and (chrm in chrms):
+				regions.append((chrm,0,genome_db.chrmLens[chrm]))
+		print "After filtering using ",len(regions)," regions"
+		(abscissa[key],ordinata[key])=fragments.plotScaling(withinArms=False,regions=regions)
+	else: 
 		from hiclib.hicShared import h5dictBinarySearch
 		assert fragments._isSorted()
 		regions = np.genfromtxt(data[key][2],dtype=None)
@@ -126,15 +155,15 @@ for key in data:
 		(abscissa[key],ordinata[key])=fragments.plotScaling(withinArms=False,fragids1=None,fragids2=desierd_fragids)
 plt.clf()
 
-out_file = open("P_s.log.txt","a")
+out_file = open(figure_path+"P_s_Larkin.log.txt","a")
 out_file.write("Start\t"+str(datetime.datetime.now())+"\n")
-for key in data:
+for key in sorted(data):
 	out_file.write(key+"\n")
 	out_file.write(str(data[key])+"\n")
 	out_file.write(str(abscissa[key])+"\n")
 	out_file.write(str(ordinata[key])+"\n")
 
-for key in data:
+for key in sorted(data):
 	ind1=abscissa[key]<7000000
 	ind2=abscissa[key]>500000
 	ind=ind1*ind2
@@ -162,5 +191,4 @@ plt.plot(xs,ys,label="1/s",linewidth=4)
 legend = plt.legend(loc=0, prop={"size": 12})
 legend.draw_frame(False)
  
-plt.savefig('P_from_s.png',dpi=300)
-		
+plt.savefig(figure_path+'P_from_s_Larkin.png',dpi=300)	
